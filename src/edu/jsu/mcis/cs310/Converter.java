@@ -98,7 +98,7 @@ public class Converter {
             prodNums.add(row[0]); // First column is "ProdNum"
 
             for (int i = 1; i < row.length; i++) {
-                if (i == 1 || i == 2) { // Assuming "Season" and "Episode" are indexes 1 & 2
+                if (i == 1 || i == 2) { 
                     rowArray.add(Integer.parseInt(row[i])); // Convert numbers to integers
                 } else {
                     rowArray.add(row[i]);
@@ -130,8 +130,32 @@ public class Converter {
         
         try {
             
-            // INSERT YOUR CODE HERE
-            
+            JsonObject jsonObject = Jsoner.deserialize(jsonString, new JsonObject());
+
+            JsonArray prodNums = (JsonArray) jsonObject.get("ProdNums");
+            JsonArray colHeadings = (JsonArray) jsonObject.get("ColHeadings");
+            JsonArray jsonData = (JsonArray) jsonObject.get("Data");
+
+            StringWriter writer = new StringWriter();
+            CSVWriter csvWriter = new CSVWriter(writer);
+
+            // Write column headers
+            csvWriter.writeNext(colHeadings.toArray(new String[0]));
+
+            // Write data rows
+            for (int i = 0; i < jsonData.size(); i++) {
+                JsonArray rowArray = (JsonArray) jsonData.get(i);
+                List<String> row = new ArrayList<>();
+                row.add(prodNums.get(i).toString()); // Add ProdNum
+
+                for (Object cell : rowArray) {
+                    row.add(cell.toString());
+                }
+                csvWriter.writeNext(row.toArray(new String[0]));
+            }
+
+            csvWriter.close();
+            result = writer.toString();
         }
         catch (Exception e) {
             e.printStackTrace();
