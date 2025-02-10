@@ -1,4 +1,4 @@
-package edu.jsu.mcis.cs310;
+package edu.jsu.mcis.cs310
 
 import com.github.cliftonlabs.json_simple.*;
 import com.opencsv.*;
@@ -77,17 +77,51 @@ public class Converter {
         String result = "{}"; // default return value; replace later!
         
         try {
-        
-            // INSERT YOUR CODE HERE
-            
+        // Step 1: Read CSV data
+        CSVReader reader = new CSVReader(new StringReader(csvString));
+        List<String[]> data = reader.readAll();
+        reader.close();
+
+        if (data.isEmpty()) {
+            return result;
         }
-        catch (Exception e) {
-            e.printStackTrace();
+
+        // Step 2: Extract headers
+        String[] headers = data.remove(0);
+
+        // Step 3: Create JSON structures
+        JsonArray prodNums = new JsonArray();
+        JsonArray jsonData = new JsonArray();
+
+        for (String[] row : data) {
+            JsonArray rowArray = new JsonArray();
+            prodNums.add(row[0]); // First column is "ProdNum"
+
+            for (int i = 1; i < row.length; i++) {
+                if (i == 1 || i == 2) { // Assuming "Season" and "Episode" are indexes 1 & 2
+                    rowArray.add(Integer.parseInt(row[i])); // Convert numbers to integers
+                } else {
+                    rowArray.add(row[i]);
+                }
+            }
+            jsonData.add(rowArray);
         }
-        
-        return result.trim();
-        
+
+        // Step 4: Construct final JSON object
+        JsonObject resultJson = new JsonObject();
+        resultJson.put("ProdNums", prodNums);
+        resultJson.put("ColHeadings", new JsonArray(List.of(headers)));
+        resultJson.put("Data", jsonData);
+
+        // Step 5: Serialize JSON object to string
+        result = Jsoner.serialize(resultJson);
+    } 
+    catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return result.trim();
+}
     
     @SuppressWarnings("unchecked")
     public static String jsonToCsv(String jsonString) {
