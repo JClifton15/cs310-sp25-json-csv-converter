@@ -1,4 +1,4 @@
-package edu.jsu.mcis.cs310
+package edu.jsu.mcis.cs310;
 
 import com.github.cliftonlabs.json_simple.*;
 import com.opencsv.*;
@@ -129,7 +129,7 @@ public class Converter {
         String result = ""; // default return value; replace later!
         
         try {
-            
+           
             JsonObject jsonObject = Jsoner.deserialize(jsonString, new JsonObject());
 
             JsonArray prodNums = (JsonArray) jsonObject.get("ProdNums");
